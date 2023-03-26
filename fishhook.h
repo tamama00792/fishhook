@@ -23,16 +23,20 @@
 
 #ifndef fishhook_h
 #define fishhook_h
-
+// 定义了标准宏及类型
 #include <stddef.h>
+// 定义了几种扩展的整数类型和宏
 #include <stdint.h>
 
+// __attribute__ 关键字的visibility用于设置动态链接库中函数的可见性，设置为hidden，则符号只在本so（动态链接库）中可见，在其他库中不可见
+// 如果没定义FISHHOOK_EXPORT，则定义FISHHOOK_VISIBILITY为hidden。否则定义为default。
 #if !defined(FISHHOOK_EXPORT)
 #define FISHHOOK_VISIBILITY __attribute__((visibility("hidden")))
 #else
 #define FISHHOOK_VISIBILITY __attribute__((visibility("default")))
 #endif
 
+// cpp文件默认定义了该宏，如果定义了__cplusplus，则采用c语言方式编译，而不是c++的
 #ifdef __cplusplus
 extern "C" {
 #endif //__cplusplus
@@ -41,10 +45,11 @@ extern "C" {
  * A structure representing a particular intended rebinding from a symbol
  * name to its replacement
  */
+ // 一个结构体，它表示从符号名称到其替换的特定重新绑定
 struct rebinding {
-  const char *name;
-  void *replacement;
-  void **replaced;
+  const char *name;//被hook的函数名
+  void *replacement;// 替换的函数指针
+  void **replaced;// 用于存放原函数指针的指针
 };
 
 /*
@@ -55,6 +60,7 @@ struct rebinding {
  * rebind are added to the existing list of rebindings, and if a given symbol
  * is rebound more than once, the later rebinding will take precedence.
  */
+ // 对于重新绑定列表中的每个重新绑定，重新绑定对
 FISHHOOK_VISIBILITY
 int rebind_symbols(struct rebinding rebindings[], size_t rebindings_nel);
 
@@ -68,6 +74,7 @@ int rebind_symbols_image(void *header,
                          struct rebinding rebindings[],
                          size_t rebindings_nel);
 
+// 采用C语言编译，而不用C++的，尾部括号
 #ifdef __cplusplus
 }
 #endif //__cplusplus
